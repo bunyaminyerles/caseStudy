@@ -37,7 +37,7 @@ function ProductsPage() {
 
     useEffect(() => {
         var tmp = 0;
-        Object.keys(cartState.cart).map((key: string) => tmp += Number(productState.data[key].price) * Number(cartState.cart[key]))
+        Object.keys(cartState.cart).map((key: string) => tmp += Number(productState.data[key]?.price) * Number(cartState.cart[key]))
         dispatch(priceUpdate(tmp))
     }, [cartState])
 
