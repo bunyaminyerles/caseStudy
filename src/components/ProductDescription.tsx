@@ -1,6 +1,8 @@
-import {Button, Card, Col, Modal, Row} from "antd";
+import {Button, Card, Col, message, Modal, Row} from "antd";
 import {Dispatch, SetStateAction} from "react";
 import {IProduct} from "../util/types";
+import {cartSlicer} from "../redux/cartSlicer";
+import {useAppDispatch} from "../redux/store";
 
 function ProductDescription({
                                 open = false,
@@ -11,6 +13,8 @@ function ProductDescription({
     setOpen: Dispatch<SetStateAction<boolean>>
     product?: IProduct
 }) {
+
+    const dispatch = useAppDispatch();
 
     const handleCancel = () => {
         setOpen(false)
@@ -65,9 +69,13 @@ function ProductDescription({
                     <Col xs={24} sm={24}>
                         <Button
 
-                            style={{width:'-webkit-fill-available'}}
+                            style={{width: '-webkit-fill-available'}}
                             type={'primary'}
                             onClick={() => {
+                                if (product?.id != null) {
+                                    dispatch(cartSlicer.actions.increase(product?.id))
+                                    message.success('Successfully')
+                                }
                             }}
                         >
                             ADD TO CART
