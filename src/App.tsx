@@ -8,7 +8,7 @@ const {Header, Content} = Layout;
 function App() {
     return (
         <Layout>
-            <Header style={{backgroundColor: '#2a59fe'}}>
+            <Header style={{backgroundColor: '#1677ff'}}>
                 <HeaderComponent/>
             </Header>
             <Content>

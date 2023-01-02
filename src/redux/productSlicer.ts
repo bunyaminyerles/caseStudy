@@ -6,11 +6,7 @@ import {stat} from "fs";
 
 const initialState = {
     data: {} as IProductState,
-    filteredData: [] as IProduct[] | undefined,
-    filterByBrand: [] as string[],
-    filterByModel: [] as string[],
-    filterByWord: [] as string[],
-    sortBy: '' as string
+    filteredData: [] as IProduct[] | undefined
 }
 
 export const productSlicer = createSlice({

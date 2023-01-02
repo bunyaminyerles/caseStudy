@@ -1,15 +1,14 @@
-import {Avatar, Button, Card, Checkbox, Col, List, message, Radio, Row, Select, Space, Tag} from "antd";
+import {Button, Card, Col, Drawer, List, Row} from "antd";
 import useGetAllProducts from "../hook/useGetAllProducts";
-import {ICartState, IProduct} from "../util/types";
+import {IProduct} from "../util/types";
 import {useEffect, useState} from "react";
 import ProductDescription from "./ProductDescription";
-import {MinusOutlined, PlusOutlined, ShoppingCartOutlined} from "@ant-design/icons";
+import {SearchOutlined, ShoppingCartOutlined, ShoppingOutlined} from "@ant-design/icons";
 import {RootState, useAppDispatch} from "../redux/store";
-import {cartSlicer, priceUpdate} from "../redux/cartSlicer";
+import {cartSlicer} from "../redux/cartSlicer";
 import {useSelector} from "react-redux";
-import VirtualList from 'rc-virtual-list';
-import {addAll, addAllFilteredData} from "../redux/productSlicer";
-import {CheckboxValueType} from "antd/es/checkbox/Group";
+import FilterComponent from "./FilterComponent";
+import CartComponent from "./CartComponent";
 
 const gridStyle: React.CSSProperties = {
     width: '100%',
@@ -25,9 +24,9 @@ function ProductsPage() {
     const {cartState, productState} = useSelector((state: RootState) => state);
     const [open, setOpen] = useState<boolean>(false)
     const [data, setData] = useState<IProduct[] | undefined>([])
-    const [brands, setBrands] = useState<CheckboxValueType[]>([])
-    const [modelsOption, setModelsOption] = useState<CheckboxValueType[]>([])
-    const [models, setModels] = useState<CheckboxValueType[]>([])
+    const [collapseFilter, setCollapseFilter] = useState<boolean>(false)
+    const [collapseCart, setCollapseCart] = useState<boolean>(false)
+
     const [selectedProduct, setSelectedProduct] = useState<IProduct>()
 
     const {
@@ -36,9 +35,11 @@ function ProductsPage() {
     } = useGetAllProducts()
 
     useEffect(() => {
-        var tmp = 0;
-        Object.keys(cartState.cart).map((key: string) => tmp += Number(productState.data[key]?.price) * Number(cartState.cart[key]))
-        dispatch(priceUpdate(tmp))
+        if (Object.keys(productState.data).length !== 0) {
+            var tmp = 0;
+            Object.keys(cartState.cart).map((key: string) => tmp += Number(productState.data[key]?.price) * Number(cartState.cart[key]))
+            dispatch(cartSlicer.actions.priceUpdate(tmp))
+        }
     }, [cartState])
 
     const showDetail = (product: IProduct) => {
@@ -46,87 +47,49 @@ function ProductsPage() {
         setSelectedProduct(product)
     }
 
-    useEffect(() => {
-        setModelsOption(
-            [...new Set(productState.filteredData?.filter((item) => brands.includes(item.brand)).map((item: any) => item.model))]
-        )
-    }, [brands])
+    const showDrawerFilter = () => {
+        setCollapseFilter(true);
+    };
 
-    useEffect(() => {
-        setModels([])
-        setBrands([])
-        setData(productState.filteredData)
-    }, [productState.filteredData])
+    const onCloseFilter = () => {
+        setCollapseFilter(false);
+    };
 
-    const applyFilter = () => {
-        if (models.length > 0) {
-            const tmp = productState.filteredData?.filter((item: IProduct) =>
-                models.includes(item.model)
-            )
-            setData(tmp)
-        } else if (brands.length > 0) {
-            const tmp = productState.filteredData?.filter((item) => brands.includes(item.brand))
-            setData(tmp)
-        } else {
-            setData(productState.filteredData)
-        }
-    }
+    const showDrawerCart = () => {
+        setCollapseCart(true);
+    };
 
-    const onChangeSortBy = (value: any) => {
-        if (value === 'oldToNew') {
-            const newData = [...data ?? []].sort((a, b) => (a.createdAt > b.createdAt) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0))
-            setData(newData)
-        } else if (value === 'newToOld') {
-            const newData = [...data ?? []].sort((a, b) => (a.createdAt < b.createdAt) ? 1 : ((b.createdAt < a.createdAt) ? -1 : 0))
-            setData(newData)
-        } else if (value === 'lowToHigh') {
-            const newData = [...data ?? []].sort((a, b) => (a.price > b.price) ? 1 : ((b.price > a.price) ? -1 : 0))
-            setData(newData)
-        } else if (value === 'highToLow') {
-            const newData = [...data ?? []].sort((a, b) => (a.price < b.price) ? 1 : ((b.price < a.price) ? -1 : 0))
-            setData(newData)
-        }
-    }
+    const onCloseCart = () => {
+        setCollapseCart(false);
+    };
 
     return (
 
         <Row>
+            <Col xs={24} sm={0}>
+                <div style={{display: "flex", justifyContent: "space-between"}}>
+                    <Button style={{
+                        borderTopRightRadius: 0,
+                        borderTopLeftRadius: 0,
+                        borderBottomLeftRadius: 0
+                    }} icon={<SearchOutlined/>} type="primary" onClick={showDrawerFilter}>
+                    </Button>
+                    <Button style={{
+                        borderTopRightRadius: 0,
+                        borderTopLeftRadius: 0,
+                        borderBottomRightRadius: 0
+                    }} icon={<ShoppingOutlined/>} type="primary" onClick={showDrawerCart}>
+                    </Button>
+                    <Drawer placement="left" onClose={onCloseFilter} open={collapseFilter}>
+                        <FilterComponent data={data} setData={setData}/>
+                    </Drawer>
+                    <Drawer placement="right" onClose={onCloseCart} open={collapseCart}>
+                        <CartComponent/>
+                    </Drawer>
+                </div>
+            </Col>
             <Col style={{marginTop: 50}} xs={0} sm={6}>
-                <Card title={'Sort by'}>
-                    <Radio.Group onChange={(value) => {
-                        onChangeSortBy(value.target.value)
-                    }}>
-                        <Space direction={'vertical'}>
-                            <Radio value={'oldToNew'}>Old to new</Radio>
-                            <Radio value={'newToOld'}>New to old</Radio>
-                            <Radio value={'highToLow'}>Price high to low</Radio>
-                            <Radio value={'lowToHigh'}>Price low to high</Radio>
-                        </Space>
-                    </Radio.Group>
-                </Card>
-                <Card title={'Brands'} style={{height: 200, overflow: 'auto', marginTop: 20}}>
-                    <Checkbox.Group value={brands} onChange={(value) => {
-                        setBrands(value)
-                    }}>
-                        <Space direction={'vertical'}>
-                            {[...new Set(productState.filteredData?.map((item: any) => item.brand))].map((item) =>
-                                <Checkbox value={item}>{item}</Checkbox>)}
-                        </Space>
-                    </Checkbox.Group>
-                </Card>
-                <Card title={'Models'} style={{height: 200, overflow: 'auto', marginTop: 20}}>
-                    <Checkbox.Group value={models} onChange={(value) => {
-                        setModels(value)
-                    }}>
-                        <Space direction={'vertical'}>
-                            {modelsOption.map((item) =>
-                                <Checkbox value={item}>{item}</Checkbox>)}
-                        </Space>
-                    </Checkbox.Group>
-                </Card>
-                <Card bodyStyle={{display: "flex", justifyContent: "center"}}>
-                    <Button type={"primary"} onClick={() => applyFilter()}> Apply Filter </Button>
-                </Card>
+                <FilterComponent data={data} setData={setData}/>
             </Col>
             <Col style={{marginTop: 50}} xs={24} sm={12}>
 
@@ -170,17 +133,17 @@ function ProductsPage() {
                                     ]}
                                 >
                                     <Card.Grid style={gridStyle}>
-                                        <span color={'#1677ff'}
-                                              style={{
-                                                  color: '#1677ff',
-                                                  fontSize: '1.2rem',
-                                                  display: "block",
-                                                  marginBlockStart: '0.5em',
-                                                  marginBlockEnd: '0.5em',
-                                                  marginInlineStart: '0px',
-                                                  marginInlineEnd: '0px',
-                                              }}
-                                              onClick={() => showDetail(item)}>{item.price} ₺</span>
+                    <span color={'#1677ff'}
+                          style={{
+                              color: '#1677ff',
+                              fontSize: '1.2rem',
+                              display: "block",
+                              marginBlockStart: '0.5em',
+                              marginBlockEnd: '0.5em',
+                              marginInlineStart: '0px',
+                              marginInlineEnd: '0px',
+                          }}
+                          onClick={() => showDetail(item)}>{item.price} ₺</span>
                                     </Card.Grid>
                                     <Card.Grid style={gridStyle} onClick={() => showDetail(item)}><p>{item.name}</p>
                                     </Card.Grid>
@@ -191,48 +154,7 @@ function ProductsPage() {
                 </Card>
             </Col>
             <Col style={{marginTop: 50}} xs={0} sm={6}>
-                <Card title={'Cart'} style={{height: 500, overflow: "auto"}}>
-                    <List>
-                        <VirtualList
-                            data={Object.keys(cartState.cart)}
-                            height={500}
-                            itemHeight={47}
-                            itemKey="cart"
-                        >
-                            {(item: string) => (
-                                <List.Item key={item}>
-                                    <Avatar src={productState.data[item]?.image}/>
-                                    <p>{productState.data[item]?.name} <br/>{productState.data[item]?.price} ₺</p>
-                                    <div style={{display: 'flex', justifyContent: "center", alignItems: 'center'}}>
-                                        <Button icon={<PlusOutlined/>} type={'primary'}
-                                                style={{borderBottomRightRadius: 0, borderTopRightRadius: 0}}
-                                                onClick={() => {
-                                                    dispatch(cartSlicer.actions.increase(productState.data[item]?.id))
-                                                }}></Button>
-                                        <Card style={{
-                                            padding: 0,
-                                            height: 32,
-                                            width: 32,
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            display: "flex",
-                                            fontSize: '1.1rem',
-                                            borderRadius: 0
-                                        }}>{cartState.cart[item]}</Card>
-                                        <Button icon={<MinusOutlined/>} type={'primary'}
-                                                style={{borderBottomLeftRadius: 0, borderTopLeftRadius: 0}}
-                                                onClick={() => {
-                                                    dispatch(cartSlicer.actions.decrease(productState.data[item]?.id))
-                                                }}></Button>
-                                    </div>
-                                </List.Item>
-                            )}
-                        </VirtualList>
-                    </List>
-                </Card>
-                <Card title={'Checkout'} style={{marginTop: 10}}>
-                    <p style={{color: '#1677ff', fontSize: "1.1rem"}}>Total Price : {cartState.price} ₺</p>
-                </Card>
+                <CartComponent/>
             </Col>
             {open ? (
                 <Col xs={24} sm={24}>
