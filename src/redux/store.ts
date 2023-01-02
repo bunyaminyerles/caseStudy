@@ -4,7 +4,7 @@ import {
     persistStore,
 } from 'redux-persist';
 import cartSlicer from "./cartSlicer";
-import { configureStore } from '@reduxjs/toolkit';
+import {configureStore, getDefaultMiddleware} from '@reduxjs/toolkit';
 import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
 import productSlicer from "./productSlicer";
 
@@ -16,13 +16,16 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, cartSlicer);
 const store = configureStore({
     reducer: {
-        cartState : persistedReducer,
+        cartState: persistedReducer,
         productState: productSlicer
     },
+    middleware: getDefaultMiddleware({
+        serializableCheck: false,
+    }),
 });
 
 let persistor = persistStore(store);
-export { persistor, store };
+export {persistor, store};
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

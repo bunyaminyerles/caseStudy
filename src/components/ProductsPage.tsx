@@ -1,4 +1,4 @@
-import {Button, Card, Col, Drawer, List, Row} from "antd";
+import {Button, Card, Col, Drawer, List, Row, Spin} from "antd";
 import useGetAllProducts from "../hook/useGetAllProducts";
 import {IProduct} from "../util/types";
 import {useEffect, useState} from "react";
@@ -9,14 +9,8 @@ import {cartSlicer} from "../redux/cartSlicer";
 import {useSelector} from "react-redux";
 import FilterComponent from "./FilterComponent";
 import CartComponent from "./CartComponent";
+import ProductListViewer from "./ProductListViewer";
 
-const gridStyle: React.CSSProperties = {
-    width: '100%',
-    height: 50,
-    textAlign: 'center',
-    justifyContent: 'center',
-    padding: 0
-};
 
 function ProductsPage() {
 
@@ -42,10 +36,6 @@ function ProductsPage() {
         }
     }, [cartState])
 
-    const showDetail = (product: IProduct) => {
-        setOpen(!open);
-        setSelectedProduct(product)
-    }
 
     const showDrawerFilter = () => {
         setCollapseFilter(true);
@@ -91,67 +81,14 @@ function ProductsPage() {
             <Col style={{marginTop: 50}} xs={0} sm={6}>
                 <FilterComponent data={data} setData={setData}/>
             </Col>
-            <Col style={{marginTop: 50}} xs={24} sm={12}>
+            <Col style={{marginTop: 50, display: "flex", justifyContent:"center", alignItems: "center"}} xs={24} sm={12}>
 
-                <Card>
-                    <List
-                        loading={isLoadingProductsData || isFetchingProductsData}
-                        style={{display: 'fixed'}}
-                        grid={{
-
-                            xs: 1,
-                            sm: 1,
-                            md: 1,
-                            lg: 2,
-                            xl: 3,
-                            xxl: 3
-                        }}
-                        pagination={{defaultPageSize: 12}}
-                        dataSource={data}
-                        renderItem={(item: IProduct) => (
-                            <List.Item>
-                                <Card
-                                    cover={
-                                        <img
-                                            onClick={() => showDetail(item)}
-                                            alt="example"
-                                            src={item.image}
-                                        />
-                                    }
-                                    actions={[
-                                        <Button
-                                            icon={<ShoppingCartOutlined/>}
-                                            size={'middle'}
-                                            block={true}
-                                            type={'primary'}
-                                            onClick={() => {
-                                                dispatch(cartSlicer.actions.increase(item.id))
-                                            }}
-                                        >
-                                            ADD TO CART
-                                        </Button>
-                                    ]}
-                                >
-                                    <Card.Grid style={gridStyle}>
-                    <span color={'#1677ff'}
-                          style={{
-                              color: '#1677ff',
-                              fontSize: '1.2rem',
-                              display: "block",
-                              marginBlockStart: '0.5em',
-                              marginBlockEnd: '0.5em',
-                              marginInlineStart: '0px',
-                              marginInlineEnd: '0px',
-                          }}
-                          onClick={() => showDetail(item)}>{item.price} ₺</span>
-                                    </Card.Grid>
-                                    <Card.Grid style={gridStyle} onClick={() => showDetail(item)}><p>{item.name}</p>
-                                    </Card.Grid>
-                                </Card>
-                            </List.Item>
-                        )}
-                    />
-                </Card>
+                {(isLoadingProductsData || isFetchingProductsData) ?
+                    <Spin/>
+                    :
+                    <ProductListViewer data={data} open={open} setOpen={setOpen}
+                                       setSelectedProduct={setSelectedProduct}></ProductListViewer>
+                }
             </Col>
             <Col style={{marginTop: 50}} xs={0} sm={6}>
                 <CartComponent/>

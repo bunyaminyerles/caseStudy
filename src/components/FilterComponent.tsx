@@ -77,7 +77,7 @@ function FilterComponent({
                 }}>
                     <Space direction={'vertical'}>
                         {[...new Set(productState.filteredData?.map((item: any) => item.brand))].map((item) =>
-                            <Checkbox value={item}>{item}</Checkbox>)}
+                            <Checkbox value={item} id={item}>{item}</Checkbox>)}
                     </Space>
                 </Checkbox.Group>
             </Card>
@@ -87,7 +87,7 @@ function FilterComponent({
                 }}>
                     <Space direction={'vertical'}>
                         {modelsOption.map((item) =>
-                            <Checkbox value={item}>{item}</Checkbox>)}
+                            <Checkbox value={item} id={String(item)}>{item}</Checkbox>)}
                     </Space>
                 </Checkbox.Group>
             </Card>
