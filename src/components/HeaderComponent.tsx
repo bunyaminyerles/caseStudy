@@ -18,7 +18,7 @@ function HeaderComponent() {
                 <span style={{color: '#FFF', fontSize: 'large'}}> Eteration </span>
             </Col>
             <Col xs={8} sm={12} style={{display: 'flex', alignItems: 'center'}}>
-                <Search placeholder='Search' onSearch={onSearch} allowClear/>
+                <Input.Search placeholder='Search' onSearch={onSearch} allowClear data-testid={'search'}/>
             </Col>
             <Col xs={16} sm={8}>
 

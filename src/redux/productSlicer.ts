@@ -32,11 +32,15 @@ export const productSlicer = createSlice({
             state.filteredData = Object.values(state.data)?.filter((item: IProduct) =>
                 item.name.search(payload) > -1
             )
+        },
+        resetProduct: (state) => {
+            state.data = {}
+            state.filteredData = []
         }
 
     }
 })
 
-export const {add, remove, addAll, addAllFilteredData, filterByWordData} = productSlicer.actions
+export const {add, remove, addAll, addAllFilteredData, filterByWordData, resetProduct} = productSlicer.actions
 
 export default productSlicer.reducer

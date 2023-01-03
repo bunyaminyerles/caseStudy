@@ -81,7 +81,8 @@ function ProductsPage() {
             <Col style={{marginTop: 50}} xs={0} sm={6}>
                 <FilterComponent data={data} setData={setData}/>
             </Col>
-            <Col style={{marginTop: 50, display: "flex", justifyContent:"center", alignItems: "center"}} xs={24} sm={12}>
+            <Col style={{marginTop: 50, display: "flex", justifyContent: "center", alignItems: "center"}} xs={24}
+                 sm={12}>
 
                 {(isLoadingProductsData || isFetchingProductsData) ?
                     <Spin/>

@@ -12,7 +12,7 @@ function FilterComponent({
 
     const {productState} = useSelector((state: RootState) => state);
     const [brands, setBrands] = useState<CheckboxValueType[]>([])
-    const [modelsOption, setModelsOption] = useState<CheckboxValueType[]>([])
+    const [modelsOption, setModelsOption] = useState<any[]>([])
     const [models, setModels] = useState<CheckboxValueType[]>([])
 
     useEffect(() => {
@@ -64,35 +64,35 @@ function FilterComponent({
                     onChangeSortBy(value.target.value)
                 }}>
                     <Space direction={'vertical'}>
-                        <Radio value={'oldToNew'}>Old to new</Radio>
-                        <Radio value={'newToOld'}>New to old</Radio>
-                        <Radio value={'highToLow'}>Price high to low</Radio>
-                        <Radio value={'lowToHigh'}>Price low to high</Radio>
+                        <Radio value={'oldToNew'} data-testid={'oldToNew'}>Old to new</Radio>
+                        <Radio value={'newToOld'} data-testid={'newToOld'}>New to old</Radio>
+                        <Radio value={'highToLow'} data-testid={'highToLow'}>Price high to low</Radio>
+                        <Radio value={'lowToHigh'} data-testid={'lowToHigh'}>Price low to high</Radio>
                     </Space>
                 </Radio.Group>
             </Card>
             <Card title={'Brands'} style={{height: 200, overflow: 'auto', marginTop: 20}}>
-                <Checkbox.Group value={brands} onChange={(value) => {
+                <Checkbox.Group value={brands} data-testid={'brands'} onChange={(value) => {
                     setBrands(value)
                 }}>
                     <Space direction={'vertical'}>
                         {[...new Set(productState.filteredData?.map((item: any) => item.brand))].map((item) =>
-                            <Checkbox value={item} id={item}>{item}</Checkbox>)}
+                            <Checkbox value={item} data-testid={item} key={item} >{item}</Checkbox>)}
                     </Space>
                 </Checkbox.Group>
             </Card>
             <Card title={'Models'} style={{height: 200, overflow: 'auto', marginTop: 20}}>
-                <Checkbox.Group value={models} onChange={(value) => {
+                <Checkbox.Group value={models} data-testid={'models'} onChange={(value) => {
                     setModels(value)
                 }}>
                     <Space direction={'vertical'}>
-                        {modelsOption.map((item) =>
-                            <Checkbox value={item} id={String(item)}>{item}</Checkbox>)}
+                        {modelsOption?.map((item) =>
+                            <Checkbox value={item} data-testid={item} key={item}>{item}</Checkbox>)}
                     </Space>
                 </Checkbox.Group>
             </Card>
             <Card bodyStyle={{display: "flex", justifyContent: "center"}}>
-                <Button type={"primary"} onClick={() => applyFilter()}> Apply Filter </Button>
+                <Button type={"primary"} data-testid={'applyFilter'} onClick={() => applyFilter()}> Apply Filter </Button>
             </Card>
         </>
     )

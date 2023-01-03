@@ -27,12 +27,16 @@ export const cartSlicer = createSlice({
         },
         priceUpdate: (state, {payload}: PayloadAction<number>) => {
             state.price = payload
+        },
+        resetCart: (state) => {
+            state.cart = {}
+            state.price = 0
         }
     },
 })
 
 
 // Action creators are generated for each case reducer function
-export const {increase, decrease, priceUpdate} = cartSlicer.actions
+export const {increase, decrease, priceUpdate, resetCart} = cartSlicer.actions
 
 export default cartSlicer.reducer
